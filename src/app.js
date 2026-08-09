@@ -47,7 +47,7 @@ app.post("/tasks", (req, res) => {
 
     const task = createTask(title);
 
-    res.status(201).json(task);
+    res.status(200).json(task);
 });
 
 app.put("/tasks/:id", (req, res) => {
