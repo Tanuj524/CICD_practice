@@ -18,14 +18,15 @@ app.get("/", (req, res) => {
     });
 });
 
-app.get("/tasks", (req, res) => {
-    res.json(getTasks());
+app.get("/tasks", async (req, res) => {
+    const tasks = await getTasks();
+    res.json(tasks);
 });
 
-app.get("/tasks/:id", (req, res) => {
+app.get("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
 
-    const task = getTaskById(id);
+    const task = await getTaskById(id);
 
     if (!task) {
         return res.status(404).json({
@@ -36,7 +37,7 @@ app.get("/tasks/:id", (req, res) => {
     res.json(task);
 });
 
-app.post("/tasks", (req, res) => {
+app.post("/tasks", async (req, res) => {
     const { title } = req.body;
 
     if (!title) {
@@ -45,16 +46,16 @@ app.post("/tasks", (req, res) => {
         });
     }
 
-    const task = createTask(title);
+    const task = await createTask(title);
 
     res.status(201).json(task);
 });
 
-app.put("/tasks/:id", (req, res) => {
+app.put("/tasks/:id", async(req, res) => {
     const id = Number(req.params.id);
     const { title, completed } = req.body;
 
-    const task = updateTask(id, title, completed);
+    const task = await updateTask(id, title, completed);
 
     if (!task) {
         return res.status(404).json({
@@ -65,10 +66,10 @@ app.put("/tasks/:id", (req, res) => {
     res.json(task);
 });
 
-app.delete("/tasks/:id", (req, res) => {
+app.delete("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
 
-    const deleted = deleteTask(id);
+    const deleted = awaitdeleteTask(id);
 
     if (!deleted) {
         return res.status(404).json({

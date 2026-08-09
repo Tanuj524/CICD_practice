@@ -1,57 +1,52 @@
-let tasks = [
-    {
-        id: 1,
-        title: "Learn CI/CD",
-        completed: false
-    }
-];
+import pool from "./db.js";
 
-export function getTasks() {
-    return tasks;
+export async function getTasks() {
+    const result = await pool.query(
+        "SELECT * FROM tasks ORDER BY id"
+    );
+
+    return result.rows;
 }
 
-export function getTaskById(id) {
-    return tasks.find(task => task.id === id);
+export async function getTaskById(id) {
+    const result = await pool.query(
+        "SELECT * FROM tasks WHERE id = $1",
+        [id]
+    );
+
+    return result.rows[0];
 }
 
-export function createTask(title) {
-    const task = {
-        id: tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1,
-        title,
-        completed: false
-    };
+export async function createTask(title) {
+    const result = await pool.query(
+        `INSERT INTO tasks (title)
+         VALUES ($1)
+         RETURNING *`,
+        [title]
+    );
 
-    tasks.push(task);
-
-    return task;
+    return result.rows[0];
 }
 
-export function updateTask(id, title, completed) {
-    const task = getTaskById(id);
+export async function updateTask(id, title, completed) {
+    const result = await pool.query(
+        `UPDATE tasks
+         SET
+            title = COALESCE($1, title),
+            completed = COALESCE($2, completed)
+         WHERE id = $3
+         RETURNING *`,
+        [title, completed, id]
+    );
 
-    if (!task) {
-        return null;
-    }
-
-    if (title !== undefined) {
-        task.title = title;
-    }
-
-    if (completed !== undefined) {
-        task.completed = completed;
-    }
-
-    return task;
+    return result.rows[0];
 }
 
-export function deleteTask(id) {
-    const index = tasks.findIndex(task => task.id === id);
+export async function deleteTask(id) {
+    const result = await pool.query(
+        "DELETE FROM tasks WHERE id = $1 RETURNING id",
+        [id]
+    );
 
-    if (index === -1) {
-        return false;
-    }
-
-    tasks.splice(index, 1);
-
-    return true;
+    return result.rowCount > 0;
 }
