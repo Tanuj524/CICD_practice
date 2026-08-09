@@ -11,11 +11,27 @@ on:
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
 
-    steps:
+    services:
+      postgres:
+        image: postgres:17-alpine
 
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: taskdb
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U postgres -d taskdb"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -28,5 +44,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run migrations
+        run: node src/migrate.js
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: taskdb
+
       - name: Run tests
         run: npm test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: taskdb
