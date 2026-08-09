@@ -69,7 +69,7 @@ app.put("/tasks/:id", async(req, res) => {
 app.delete("/tasks/:id", async (req, res) => {
     const id = Number(req.params.id);
 
-    const deleted = awaitdeleteTask(id);
+    const deleted = await deleteTask(id);
 
     if (!deleted) {
         return res.status(404).json({

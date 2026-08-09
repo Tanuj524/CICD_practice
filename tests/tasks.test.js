@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../src/app.js";
-import { describe, test, expect } from "@jest/globals";
+import pool from "../src/db.js";
+import { describe, test, expect, afterAll } from "@jest/globals";
 
 describe("Task API", () => {
 
@@ -33,12 +34,20 @@ describe("Task API", () => {
     });
 
     test("GET /tasks/:id should return a task", async () => {
-        const response = await request(app)
-            .get("/tasks/1");
+    const createResponse = await request(app)
+        .post("/tasks")
+        .send({
+            title: "Task for GET test"
+        });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.id).toBe(1);
-    });
+    const id = createResponse.body.id;
+
+    const response = await request(app)
+        .get(`/tasks/${id}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.id).toBe(id);
+});
 
     test("GET /tasks/:id should return 404 for missing task", async () => {
         const response = await request(app)
@@ -48,23 +57,43 @@ describe("Task API", () => {
     });
 
     test("PUT /tasks/:id should update a task", async () => {
-        const response = await request(app)
-            .put("/tasks/1")
-            .send({
-                title: "Updated task",
-                completed: true
-            });
+    const createResponse = await request(app)
+        .post("/tasks")
+        .send({
+            title: "Task before update"
+        });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.title).toBe("Updated task");
-        expect(response.body.completed).toBe(true);
-    });
+    const id = createResponse.body.id;
+
+    const response = await request(app)
+        .put(`/tasks/${id}`)
+        .send({
+            title: "Updated task",
+            completed: true
+        });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.title).toBe("Updated task");
+    expect(response.body.completed).toBe(true);
+});
 
     test("DELETE /tasks/:id should delete a task", async () => {
-        const response = await request(app)
-            .delete("/tasks/1");
+    const createResponse = await request(app)
+        .post("/tasks")
+        .send({
+            title: "Task to delete"
+        });
 
-        expect(response.statusCode).toBe(204);
-    });
+    const id = createResponse.body.id;
 
+    const response = await request(app)
+        .delete(`/tasks/${id}`);
+
+    expect(response.statusCode).toBe(204);
+});
+
+});
+
+afterAll(async () => {
+    await pool.end();
 });
