@@ -82,4 +82,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: tags: ghcr.io/tanuj524/cicd_practice:latest
+          tags: ghcr.io/tanuj524/cicd_practice:latest
