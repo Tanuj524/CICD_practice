@@ -61,3 +61,13 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: taskdb
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: task-api:test
