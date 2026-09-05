@@ -20,4 +20,4 @@ resource "aws_s3_bucket" "practice_bucket" {
     Name        = "Terraform Practice Bucket"
     Environment = "Learning"
   }
-}`                      
+}                      
