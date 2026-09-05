@@ -13,3 +13,11 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+resource "aws_s3_bucket" "practice_bucket" {
+  bucket = "terraform-practice123-s3-408766208763"
+
+  tags = {
+    Name        = "Terraform Practice Bucket"
+    Environment = "Learning"
+  }
+}`                      
